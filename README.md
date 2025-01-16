@@ -1,5 +1,4 @@
-# kosinak.github.io
-## FriendShield Legal Info
+# FriendShield Legal Info
 
 ### Соглашение с конечным пользователем для платного сервера Minecraft FriendShield
 1. Введение
