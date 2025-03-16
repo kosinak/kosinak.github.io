@@ -3,27 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page.title }}</title>
+    <title>kosinak</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            overflow-x: hidden;
+        }
+        header {
+            background: #007BFF;
+            text-align: center;
+            padding: 50px 0;
+            position: relative;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 3rem;
+            animation: fadeIn 2s;
+        }
+        header p {
+            font-size: 1.5rem;
+            animation: fadeIn 2s 0.5s forwards;
+        }
+        section {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: slideIn 1s forwards;
+        }
+        h2 {
+            color: #007BFF;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background: #007BFF;
+            position: relative;
+        }
+        footer p {
+            margin: 0;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>kosinak</h1>
-        <nav>
-            <ul>
-                <li><a href="{{ '/' | absolute_url }}">Главная</a></li>
+
+<header>
+    <h1>kosinak</h1>
+</header>
+
+<section>
+    <h2>Привет</h2>
+    <p>Мне очень приятно видеть вас на своей странице. У меня есть много интересного</p>
+</section>
+
+<section>
+    <h2>Страницы</h2>
+    <p>На этом сайте есть несколько страниц. Надеюсь вас зацепит</p>
+    <li><a href="{{ '/' | absolute_url }}">Главная</a></li>
                 <li><a href="{{ '/about.html' | absolute_url }}">О мне</a></li>
                 <li><a href="{{ '/goydazvon.html' | absolute_url }}">ГойдаЗвон</a></li>
                 <li><a href="{{ '/friendshield.html' | absolute_url }}">FriendShield</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <main>
-        {{ content }}
-    </main>
+    <p>Все в этой жизни меняется и этот сайт не исключение. Ждите обновлений</p>
+</section>
 
-    <footer>
-        <p>&copy; {{ site.time | date: '%Y' }} Мой сайт на GitHub Pages.</p>
-    </footer>
+<section>
+    <h2>Контакты</h2>
+    <p>Вы можете связаться со мной по электронной почте: <a href="mailto:kosinak39@gmail.com">kosinak39@gmail.com</a></p>
+    <p>Будет очень приятно получить обратную связь</p>
+</section>
+
+<footer>
+    <p>© 2023 kosinak. Все права защищены.</p>
+</footer>
+
 </body>
 </html>
