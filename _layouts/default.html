@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+</head>
+<body>
+    <header>
+        <h1>kosinak</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ '/' | absolute_url }}">Главная</a></li>
+                <li><a href="{{ '/about.md' | absolute_url }}">О мне</a></li>
+                <li><a href="{{ '/goydazvon.md' | absolute_url }}">ГойдаЗвон</a></li>
+                <li><a href="{{ '/friendshield.md' | absolute_url }}">FriendShield</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        {{ content }}
+    </main>
+
+    <footer>
+        <p>&copy; {{ site.time | date: '%Y' }} Мой сайт на GitHub Pages.</p>
+    </footer>
+</body>
+</html>
