@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор заявления (DOCX)</title>
+    <!-- Подключаем библиотеку docx (версия 7.4.1 для браузерной совместимости) -->
+    <script src="https://unpkg.com/docx@7.4.1/build/index.js" defer></script>
+    <!-- Подключаем JSZip для работы с архивами (требуется docx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2D2D2D;
+            --secondary-color: #3A3A3A;
+            --dark-color: #1A1A1A;
+            --light-color: #404040;
+            --accent-color: #7289DA;
+            --text-color: #E0E0E0;
+            --background-color: #121212;
+            --card-bg: #1E1E1E;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            display: none; /* Скрыли логотип */
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            display: inline-block;
+            width: 250px; /* Ширина для меток */
+            margin-right: 10px;
+        }
+
+        .form-group input, .form-group textarea {
+            flex: 1;
+            width: calc(100% - 260px); /* Ширина для полей */
+            padding: 8px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: #6378c9;
+            transform: translateY(-2px);
+        }
+
+        .btn-download {
+            background: #4CAF50;
+        }
+
+        .btn-download:hover {
+            background: #45a049;
+        }
+
+        .btn-generate {
+            background: var(--secondary-color);
+        }
+
+        .btn-generate:hover {
+            background: var(--primary-color);
+        }
+
+        .btn-back {
+            background: var(--dark-color);
+        }
+
+        .btn-back:hover {
+            background: #0f0f0f;
+        }
+
+        .preview-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .preview-content {
+            white-space: pre-line;
+            padding: 10px;
+            background-color: #2a2a2a;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group label {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+
+            .form-group input, .form-group textarea {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Генератор заявления (DOCX)</h1>
+        </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label for="schoolName">Название школы:</label>
+                <input type="text" id="schoolName" placeholder="Например: МБОУ СОШ №52">
+            </div>
+
+            <div class="form-group">
+                <label for="directorName">ФИО директора (в дательном падеже):</label>
+                <input type="text" id="directorName" placeholder="Например: Дремову Дремову Дремову">
+            </div>
+
+            <div class="form-group">
+                <label for="parentName">ФИО родителя (в родительном падеже):</label>
+                <input type="text" id="parentName" placeholder="Например: Дремова Дремова Дремова">
+            </div>
+
+            <div class="form-group">
+                <label for="studentName">ФИО ученика (в родительном падеже):</label>
+                <input type="text" id="studentName" placeholder="Например: Дремова Дремова Дремова">
+            </div>
+
+            <div class="form-group">
+                <label for="studentClass">Класс (например, 12А):</label>
+                <input type="text" id="studentClass">
+            </div>
+
+            <div class="form-group">
+                <label for="date">Дата (например, 17.10.2025):</label>
+                <input type="text" id="date" placeholder="ЧЧ.ММ.ГГГГ">
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Причина:</label>
+                <textarea id="reason" placeholder="не хочу, отъебитесь от меня"></textarea>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-generate" onclick="updatePreview()">
+                    <i class="fas fa-sync-alt"></i> Обновить Превью
+                </button>
+                <!-- Изменяем кнопку -->
+                <button class="btn btn-download" onclick="checkAndGenerateDocx()">
+                    <i class="fas fa-download"></i> Скачать DOCX
+                </button>
+                <a href="index.html" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Назад
+                </a>
+            </div>
+        </div>
+
+        <!-- Превью документа -->
+        <div class="preview-section">
+            <h2>Превью Заявления</h2>
+            <div id="preview-content" class="preview-content">Заполните форму и нажмите "Обновить Превью", чтобы увидеть результат.</div>
+        </div>
+
+    </div>
+
+    <script>
+        // Функция для проверки доступности docx перед генерацией
+        function checkAndGenerateDocx() {
+            if (typeof docx === 'undefined' || typeof docx.Document === 'undefined') {
+                console.error('Библиотека docx не загружена или не инициализирована.');
+                alert('Ошибка: библиотека для генерации DOCX не готова. Пожалуйста, обновите страницу.');
+                return;
+            }
+            generateDocx();
+        }
+
+        function updatePreview() {
+            const schoolName = document.getElementById('schoolName').value || '[НАЗВАНИЕ ШКОЛЫ]';
+            const directorName = document.getElementById('directorName').value || '[ФИО ДИРЕКТОРА В ДАТ. ПАДЕЖЕ]';
+            const parentName = document.getElementById('parentName').value || '[ФИО РОДИТЕЛЯ В РОД ПАДЕЖЕ]';
+            const studentName = document.getElementById('studentName').value || '[ФИО УЧЕНИКА В РОД ПАДЕЖЕ]';
+            const studentClass = document.getElementById('studentClass').value || '[КЛАСС]';
+            const date = document.getElementById('date').value || '[ДД.ММ.ГГГГ]';
+            const reason = document.getElementById('reason').value || '[ПРИЧИНА]';
+
+            const text = `Директору ${schoolName}\n${directorName}\nот ${parentName}\n\nзаявление\nПрошу Вас освободить от учебных занятий мою дочь (моего сына) ${studentName},\nучащегося(щуюся) ${studentClass} класса, ${date}\nв связи с ${reason}.\n\nОтветственность за сохранность жизни и здоровья ребенка в указанный период,\nа также освоение учебной программы беру на себя.\nЧисло _____________\nПодпись ____________`;
+
+            // Обновляем превью на странице
+            document.getElementById('preview-content').textContent = text;
+        }
+
+        function generateDocx() {
+            // Извлекаем классы из глобального объекта docx
+            const { Document, Paragraph, TextRun, AlignmentType, Packer } = docx;
+
+            const schoolName = document.getElementById('schoolName').value || '[НАЗВАНИЕ ШКОЛЫ]';
+            const directorName = document.getElementById('directorName').value || '[ФИО ДИРЕКТОРА В ДАТ. ПАДЕЖЕ]';
+            const parentName = document.getElementById('parentName').value || '[ФИО РОДИТЕЛЯ В РОД ПАДЕЖЕ]';
+            const studentName = document.getElementById('studentName').value || '[ФИО УЧЕНИКА В РОД ПАДЕЖЕ]';
+            const studentClass = document.getElementById('studentClass').value || '[КЛАСС]';
+            const date = document.getElementById('date').value || '[ДД.ММ.ГГГГ]';
+            const reason = document.getElementById('reason').value || '[ПРИЧИНА]';
+
+            // Создаем документ
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        // Адресная часть (справа)
+                        new Paragraph({
+                            alignment: AlignmentType.RIGHT, // Выравнивание по правому краю
+                            children: [
+                                new TextRun(`Директору ${schoolName}`),
+                            ]
+                        }),
+                        new Paragraph({
+                            alignment: AlignmentType.RIGHT,
+                            children: [
+                                new TextRun(directorName),
+                            ]
+                        }),
+                        new Paragraph({
+                            alignment: AlignmentType.RIGHT,
+                            children: [
+                                new TextRun(`от ${parentName}`),
+                            ]
+                        }),
+                        // Пустая строка
+                        new Paragraph({
+                            children: [new TextRun("")],
+                        }),
+                        // Заголовок "заявление" (по центру)
+                        new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                                new TextRun({
+                                    text: "заявление",
+                                    bold: true,
+                                }),
+                            ]
+                        }),
+                        // Пустая строка
+                        new Paragraph({
+                            children: [new TextRun("")],
+                        }),
+                        // Основной текст заявления (по левому краю)
+                        new Paragraph({
+                            alignment: AlignmentType.LEFT,
+                            children: [
+                                new TextRun("Прошу Вас освободить от учебных занятий мою дочь (моего сына) "),
+                                new TextRun(studentName),
+                                new TextRun(","),
+                            ]
+                        }),
+                         new Paragraph({
+                            alignment: AlignmentType.LEFT,
+                            children: [
+                                new TextRun("учащегося(щуюся) "),
+                                new TextRun(studentClass),
+                                new TextRun(" класса, "),
+                                new TextRun(date),
+                            ]
+                        }),
+                         new Paragraph({
+                            alignment: AlignmentType.LEFT,
+                            children: [
+                                new TextRun("в связи с "),
+                                new TextRun(reason),
+                                new TextRun("."),
+                            ]
+                        }),
+                         new Paragraph({
+                            children: [new TextRun("")], // Пустая строка
+                        }),
+                        new Paragraph({
+                            alignment: AlignmentType.LEFT,
+                            children: [
+                                new TextRun("Ответственность за сохранность жизни и здоровья ребенка в указанный период,"),
+                            ]
+                        }),
+                         new Paragraph({
+                            alignment: AlignmentType.LEFT,
+                            children: [
+                                new TextRun("а также освоение учебной программы беру на себя."),
+                            ]
+                        }),
+                        // Пустые строки перед подписью
+                        new Paragraph({ children: [new TextRun("")], }),
+                        new Paragraph({ children: [new TextRun("")], }),
+                        // Подпись и дата (слева)
+                        new Paragraph({
+                            alignment: AlignmentType.LEFT, // Выравнивание по левому краю
+                            children: [
+                                new TextRun("Число _____________"),
+                            ]
+                        }),
+                         new Paragraph({
+                            alignment: AlignmentType.LEFT, // Выравнивание по левому краю
+                            children: [
+                                new TextRun("Подпись ____________"),
+                            ]
+                        }),
+                    ],
+                }],
+            });
+
+            // Генерируем и скачиваем файл
+            const btn = document.querySelector('.btn-download');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Генерация...';
+            btn.disabled = true;
+
+            Packer.toBlob(doc).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Заявление_директору.docx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                 btn.innerHTML = originalText;
+                 btn.disabled = false;
+            }).catch(error => {
+                console.error('Ошибка генерации DOCX:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('Произошла ошибка при генерации DOCX файла.');
+            });
+        }
+
+        // Обновляем превью при загрузке страницы
+        window.addEventListener('load', () => {
+             document.getElementById('preview-content').textContent = 'Заполните форму и нажмите "Обновить Превью", чтобы увидеть результат.';
+        });
+    </script>
+</body>
+</html>
