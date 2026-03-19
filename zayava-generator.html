@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Генератор заявления (DOCX)</title>
-    <!-- Подключаем библиотеку docx (версия 7.4.1 для браузерной совместимости) -->
     <script src="https://unpkg.com/docx@7.4.1/build/index.js" defer></script>
-    <!-- Подключаем JSZip для работы с архивами (требуется docx) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -70,13 +68,13 @@
 
         .form-group label {
             display: inline-block;
-            width: 250px; /* Ширина для меток */
+            width: 250px;
             margin-right: 10px;
         }
 
         .form-group input, .form-group textarea {
             flex: 1;
-            width: calc(100% - 260px); /* Ширина для полей */
+            width: calc(100% - 260px);
             padding: 8px;
             background-color: var(--secondary-color);
             color: var(--text-color);
@@ -230,7 +228,6 @@
                 <button class="btn btn-generate" onclick="updatePreview()">
                     <i class="fas fa-sync-alt"></i> Обновить Превью
                 </button>
-                <!-- Изменяем кнопку -->
                 <button class="btn btn-download" onclick="checkAndGenerateDocx()">
                     <i class="fas fa-download"></i> Скачать DOCX
                 </button>
@@ -240,7 +237,6 @@
             </div>
         </div>
 
-        <!-- Превью документа -->
         <div class="preview-section">
             <h2>Превью Заявления</h2>
             <div id="preview-content" class="preview-content">Заполните форму и нажмите "Обновить Превью", чтобы увидеть результат.</div>
@@ -249,7 +245,6 @@
     </div>
 
     <script>
-        // Функция для проверки доступности docx перед генерацией
         function checkAndGenerateDocx() {
             if (typeof docx === 'undefined' || typeof docx.Document === 'undefined') {
                 console.error('Библиотека docx не загружена или не инициализирована.');
@@ -270,12 +265,10 @@
 
             const text = `Директору ${schoolName}\n${directorName}\nот ${parentName}\n\nзаявление\nПрошу Вас освободить от учебных занятий мою дочь (моего сына) ${studentName},\nучащегося(щуюся) ${studentClass} класса, ${date}\nв связи с ${reason}.\n\nОтветственность за сохранность жизни и здоровья ребенка в указанный период,\nа также освоение учебной программы беру на себя.\nЧисло _____________\nПодпись ____________`;
 
-            // Обновляем превью на странице
             document.getElementById('preview-content').textContent = text;
         }
 
         function generateDocx() {
-            // Извлекаем классы из глобального объекта docx
             const { Document, Paragraph, TextRun, AlignmentType, Packer } = docx;
 
             const schoolName = document.getElementById('schoolName').value || '[НАЗВАНИЕ ШКОЛЫ]';
@@ -286,14 +279,12 @@
             const date = document.getElementById('date').value || '[ДД.ММ.ГГГГ]';
             const reason = document.getElementById('reason').value || '[ПРИЧИНА]';
 
-            // Создаем документ
             const doc = new Document({
                 sections: [{
                     properties: {},
                     children: [
-                        // Адресная часть (справа)
                         new Paragraph({
-                            alignment: AlignmentType.RIGHT, // Выравнивание по правому краю
+                            alignment: AlignmentType.RIGHT,
                             children: [
                                 new TextRun(`Директору ${schoolName}`),
                             ]
@@ -310,11 +301,9 @@
                                 new TextRun(`от ${parentName}`),
                             ]
                         }),
-                        // Пустая строка
                         new Paragraph({
                             children: [new TextRun("")],
                         }),
-                        // Заголовок "заявление" (по центру)
                         new Paragraph({
                             alignment: AlignmentType.CENTER,
                             children: [
@@ -324,11 +313,9 @@
                                 }),
                             ]
                         }),
-                        // Пустая строка
                         new Paragraph({
                             children: [new TextRun("")],
                         }),
-                        // Основной текст заявления (по левому краю)
                         new Paragraph({
                             alignment: AlignmentType.LEFT,
                             children: [
@@ -355,7 +342,7 @@
                             ]
                         }),
                          new Paragraph({
-                            children: [new TextRun("")], // Пустая строка
+                            children: [new TextRun("")],
                         }),
                         new Paragraph({
                             alignment: AlignmentType.LEFT,
@@ -369,18 +356,16 @@
                                 new TextRun("а также освоение учебной программы беру на себя."),
                             ]
                         }),
-                        // Пустые строки перед подписью
                         new Paragraph({ children: [new TextRun("")], }),
                         new Paragraph({ children: [new TextRun("")], }),
-                        // Подпись и дата (слева)
                         new Paragraph({
-                            alignment: AlignmentType.LEFT, // Выравнивание по левому краю
+                            alignment: AlignmentType.LEFT,
                             children: [
                                 new TextRun("Число _____________"),
                             ]
                         }),
                          new Paragraph({
-                            alignment: AlignmentType.LEFT, // Выравнивание по левому краю
+                            alignment: AlignmentType.LEFT,
                             children: [
                                 new TextRun("Подпись ____________"),
                             ]
@@ -389,7 +374,6 @@
                 }],
             });
 
-            // Генерируем и скачиваем файл
             const btn = document.querySelector('.btn-download');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Генерация...';
@@ -415,7 +399,6 @@
             });
         }
 
-        // Обновляем превью при загрузке страницы
         window.addEventListener('load', () => {
              document.getElementById('preview-content').textContent = 'Заполните форму и нажмите "Обновить Превью", чтобы увидеть результат.';
         });
